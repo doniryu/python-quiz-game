@@ -1,3 +1,5 @@
+import json
+from pathlib import Path
 from quiz import Quiz
 from questions import create_default_quizzes
 
@@ -5,6 +7,8 @@ from questions import create_default_quizzes
 class QuizGame:
     def __init__(self):
         self.quizzes = create_default_quizzes()
+        self.best_score = 0
+        self.load_state()
 
     def play(self):
         if not self.quizzes:
@@ -64,3 +68,58 @@ class QuizGame:
         quiz = Quiz(question, choices, int(answer))
         self.quizzes.append(quiz)
         print("퀴즈가 추가되었습니다!")
+        self.save_state()
+
+        import json
+        from pathlib import Path
+
+    def save_state(self):
+        data = {
+            "quizzes": [quiz.to_dict() for quiz in self.quizzes],
+            "best_score": getattr(self, "best_score", 0),
+        }
+
+        path = Path(__file__).resolve().parent / "state.json"
+
+        try:
+            with path.open("w", encoding="utf-8") as file:
+                json.dump(data, file, ensure_ascii=False, indent=2)
+            print("문제와 점수를 저장했습니다.")
+        except OSError:
+            print("파일을 저장하지 못했습니다. 폴더 권한을 확인해 주세요.")
+    def load_state(self):
+        path = Path(__file__).resolve().parent / "state.json"
+
+        try:
+            with path.open("r", encoding="utf-8") as file:
+                data = json.load(file)
+
+            quizzes = []
+            for item in data["quizzes"]:
+                question = item["question"]
+                choices = item["choices"]
+                answer = item["answer"]
+
+                if not isinstance(question, str) or not question.strip():
+                    raise ValueError
+                if not isinstance(choices, list) or len(choices) != 4:
+                    raise ValueError
+                if any(not isinstance(c, str) or not c.strip() for c in choices):
+                    raise ValueError
+                if type(answer) is not int or answer not in range(1, 5):
+                    raise ValueError
+
+                quizzes.append(Quiz(question, choices, answer))
+
+            best_score = data["best_score"]
+            if type(best_score) is not int or best_score < 0:
+                raise ValueError
+
+            self.quizzes = quizzes
+            self.best_score = best_score
+            print("저장된 문제와 점수를 불러왔습니다.")
+
+        except FileNotFoundError:
+            print("첫 실행입니다. 기본 문제로 시작합니다.")
+        except (ValueError, KeyError, TypeError, OSError):
+            print("저장 파일을 읽을 수 없어 기본 문제로 시작합니다.")

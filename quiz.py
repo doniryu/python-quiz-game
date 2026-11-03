@@ -11,4 +11,17 @@ class Quiz:
 
     def check_answer(self, user_answer):
         return user_answer == self.answer
-        
+
+    def to_dict(self):
+        return {
+            "question": self.question,
+            "choices": self.choices,
+            "answer": self.answer,
+        }
+
+    def to_dict(self):
+        return {
+            "question": self.question,
+            "choices": self.choices,
+            "answer": self.answer,
+        }
