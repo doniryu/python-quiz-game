@@ -1,3 +1,4 @@
+from quiz import Quiz
 from questions import create_default_quizzes
 
 
@@ -40,4 +41,26 @@ class QuizGame:
         for number, quiz in enumerate(self.quizzes, start=1):
             print(f"{number}. {quiz.question}")
 
-            
+    def add_quiz(self):
+        question = input("새 문제를 입력하세요: ").strip()
+        while not question:
+            print("문제 내용을 입력해 주세요.")
+            question = input("새 문제를 입력하세요: ").strip()
+
+        choices = []
+        for number in range(1, 5):
+            choice = input(f"보기 {number}: ").strip()
+            while not choice:
+                print("빈 보기 대신 내용을 입력해 주세요.")
+                choice = input(f"보기 {number}: ").strip()
+            choices.append(choice)
+
+        while True:
+            answer = input("정답 번호 (1~4): ").strip()
+            if answer in ["1", "2", "3", "4"]:
+                break
+            print("1~4 중 하나를 입력해 주세요.")
+
+        quiz = Quiz(question, choices, int(answer))
+        self.quizzes.append(quiz)
+        print("퀴즈가 추가되었습니다!")
