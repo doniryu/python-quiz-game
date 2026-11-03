@@ -117,3 +117,11 @@ git log --oneline --graph --all
 2. 복사본의 README에 문장을 추가하고 commit과 push를 했습니다.
 3. 원래 작업 폴더에서 git pull --ff-only를 실행했습니다.
 4. README 마지막 부분에 추가한 문장이 반영된 것을 확인했습니다.
+
+## 개발 환경 확인
+- Python: 3.15.2
+- Git: 2.56.0.windows.4
+- 작업 브랜치: main
+
+![개발 환경 확인](docs/screenshots/environment.png)
+
