@@ -23,6 +23,6 @@ while True:
     elif choice == "2":
         game.add_quiz()
     elif choice == "4":
-        print("이 기능은 곧 만들 예정입니다.")
+        game.show_score()
     else:
         print("1~5 중 하나를 입력해 주세요.")

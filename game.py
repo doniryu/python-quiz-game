@@ -35,7 +35,11 @@ class QuizGame:
                 print(f"아쉽네요! 정답은 {quiz.answer}번입니다.\n")
 
         print(f"결과: {len(self.quizzes)}문제 중 {score}문제 정답!")
+        if score > self.best_score:
+            self.best_score = score
+            print("새로운 최고 기록입니다!")
 
+        self.save_state()
     def show_quizzes(self):
         if not self.quizzes:
             print("등록된 퀴즈가 없습니다.")
@@ -123,3 +127,9 @@ class QuizGame:
             print("첫 실행입니다. 기본 문제로 시작합니다.")
         except (ValueError, KeyError, TypeError, OSError):
             print("저장 파일을 읽을 수 없어 기본 문제로 시작합니다.")
+
+    def show_score(self):
+        if self.best_score == 0:
+            print("아직 정답 기록이 없습니다. 퀴즈에 도전해 보세요!")
+        else:
+            print(f"최고 기록: {self.best_score}문제 정답!")
