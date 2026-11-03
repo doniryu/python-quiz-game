@@ -89,3 +89,5 @@ state.json은 프로젝트 폴더에 UTF-8로 저장합니다.
 git log --oneline --graph --all
 ```
 
+
+복제한 저장소에서도 작업하고 변경 내용을 공유할 수 있습니다.
