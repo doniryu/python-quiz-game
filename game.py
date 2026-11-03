@@ -1,5 +1,7 @@
 import json
+import shutil
 from pathlib import Path
+
 from quiz import Quiz
 from questions import create_default_quizzes
 
@@ -22,10 +24,8 @@ class QuizGame:
 
             while True:
                 answer = input("정답 번호를 입력하세요 (1~4): ").strip()
-
                 if answer in ["1", "2", "3", "4"]:
                     break
-
                 print("1~4 중 하나를 입력해 주세요.")
 
             if quiz.check_answer(int(answer)):
@@ -35,11 +35,13 @@ class QuizGame:
                 print(f"아쉽네요! 정답은 {quiz.answer}번입니다.\n")
 
         print(f"결과: {len(self.quizzes)}문제 중 {score}문제 정답!")
+
         if score > self.best_score:
             self.best_score = score
             print("새로운 최고 기록입니다!")
 
         self.save_state()
+
     def show_quizzes(self):
         if not self.quizzes:
             print("등록된 퀴즈가 없습니다.")
@@ -69,61 +71,93 @@ class QuizGame:
                 break
             print("1~4 중 하나를 입력해 주세요.")
 
-        quiz = Quiz(question, choices, int(answer))
-        self.quizzes.append(quiz)
+        self.quizzes.append(Quiz(question, choices, int(answer)))
         print("퀴즈가 추가되었습니다!")
         self.save_state()
 
     def save_state(self):
+        path = Path(__file__).resolve().parent / "state.json"
+        backup = path.with_name("state.json.bak")
+        temp = path.with_name("state.json.tmp")
+        backup_temp = path.with_name("state.json.bak.tmp")
+
         data = {
             "quizzes": [quiz.to_dict() for quiz in self.quizzes],
-            "best_score": getattr(self, "best_score", 0),
+            "best_score": self.best_score,
         }
 
-        path = Path(__file__).resolve().parent / "state.json"
-
         try:
-            with path.open("w", encoding="utf-8") as file:
+            with temp.open("w", encoding="utf-8") as file:
                 json.dump(data, file, ensure_ascii=False, indent=2)
-            print("문제와 점수를 저장했습니다.")
+
+            shutil.copyfile(temp, backup_temp)
+            temp.replace(path)
+            backup_temp.replace(backup)
+            print("문제와 점수를 저장하고 백업했습니다.")
         except OSError:
-            print("파일을 저장하지 못했습니다. 폴더 권한을 확인해 주세요.")
+            print("저장 또는 백업에 실패했습니다.")
+            print("폴더 권한과 저장 공간을 확인해 주세요.")
+
+    def read_state_file(self, path):
+        with path.open("r", encoding="utf-8") as file:
+            data = json.load(file)
+
+        if not isinstance(data, dict):
+            raise ValueError("잘못된 저장 형식")
+        if not isinstance(data.get("quizzes"), list):
+            raise ValueError("잘못된 퀴즈 목록")
+
+        quizzes = []
+        for item in data["quizzes"]:
+            if not isinstance(item, dict):
+                raise ValueError("잘못된 문제 형식")
+
+            question = item["question"]
+            choices = item["choices"]
+            answer = item["answer"]
+
+            if not isinstance(question, str) or not question.strip():
+                raise ValueError("빈 문제")
+            if not isinstance(choices, list) or len(choices) != 4:
+                raise ValueError("보기는 4개 필요")
+            if any(
+                not isinstance(choice, str) or not choice.strip()
+                for choice in choices
+            ):
+                raise ValueError("잘못된 보기")
+            if type(answer) is not int or answer not in range(1, 5):
+                raise ValueError("잘못된 정답")
+
+            quizzes.append(Quiz(question, choices, answer))
+
+        best_score = data["best_score"]
+        if type(best_score) is not int or best_score < 0:
+            raise ValueError("잘못된 점수")
+
+        return quizzes, best_score
+
     def load_state(self):
         path = Path(__file__).resolve().parent / "state.json"
+        backup = path.with_name("state.json.bak")
+        errors = (OSError, ValueError, KeyError, TypeError)
 
         try:
-            with path.open("r", encoding="utf-8") as file:
-                data = json.load(file)
-
-            quizzes = []
-            for item in data["quizzes"]:
-                question = item["question"]
-                choices = item["choices"]
-                answer = item["answer"]
-
-                if not isinstance(question, str) or not question.strip():
-                    raise ValueError
-                if not isinstance(choices, list) or len(choices) != 4:
-                    raise ValueError
-                if any(not isinstance(c, str) or not c.strip() for c in choices):
-                    raise ValueError
-                if type(answer) is not int or answer not in range(1, 5):
-                    raise ValueError
-
-                quizzes.append(Quiz(question, choices, answer))
-
-            best_score = data["best_score"]
-            if type(best_score) is not int or best_score < 0:
-                raise ValueError
-
-            self.quizzes = quizzes
-            self.best_score = best_score
+            self.quizzes, self.best_score = self.read_state_file(path)
             print("저장된 문제와 점수를 불러왔습니다.")
+            return
+        except errors:
+            pass
 
-        except FileNotFoundError:
-            print("첫 실행입니다. 기본 문제로 시작합니다.")
-        except (ValueError, KeyError, TypeError, OSError):
-            print("저장 파일을 읽을 수 없어 기본 문제로 시작합니다.")
+        try:
+            self.quizzes, self.best_score = self.read_state_file(backup)
+            print("저장 파일이 없거나 손상되어 백업에서 복구했습니다.")
+            return
+        except errors:
+            pass
+
+        self.quizzes = create_default_quizzes()
+        self.best_score = 0
+        print("사용 가능한 저장 파일이 없어 기본 문제로 시작합니다.")
 
     def show_score(self):
         if self.best_score == 0:
