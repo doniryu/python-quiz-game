@@ -218,3 +218,10 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Local backup files
+*.before-backup
+state.json.bak
+state.json.recovery-test
+state.json.tmp
+state.json.bak.tmp
