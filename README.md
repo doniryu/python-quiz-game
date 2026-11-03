@@ -91,3 +91,29 @@ git log --oneline --graph --all
 
 
 복제한 저장소에서도 작업하고 변경 내용을 공유할 수 있습니다.
+
+## 실행 화면
+
+### 메뉴
+![메뉴](docs/screenshots/menu.png)
+
+### 퀴즈 풀기
+![퀴즈 풀기](docs/screenshots/play.png)
+
+### 퀴즈 추가
+![퀴즈 추가](docs/screenshots/add_quiz.png)
+
+### 퀴즈 목록
+![퀴즈 목록](docs/screenshots/list.png)
+
+### 최고 점수
+![최고 점수](docs/screenshots/score.png)
+
+### Git 작업 기록
+![Git 작업 기록](docs/screenshots/git-log.png)
+
+## 저장소 복제와 변경 가져오기 실습
+1. 별도 폴더 python-quiz-game-copy에 저장소를 clone했습니다.
+2. 복사본의 README에 문장을 추가하고 commit과 push를 했습니다.
+3. 원래 작업 폴더에서 git pull --ff-only를 실행했습니다.
+4. README 마지막 부분에 추가한 문장이 반영된 것을 확인했습니다.
