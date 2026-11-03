@@ -18,10 +18,3 @@ class Quiz:
             "choices": self.choices,
             "answer": self.answer,
         }
-
-    def to_dict(self):
-        return {
-            "question": self.question,
-            "choices": self.choices,
-            "answer": self.answer,
-        }

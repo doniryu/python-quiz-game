@@ -74,9 +74,6 @@ class QuizGame:
         print("퀴즈가 추가되었습니다!")
         self.save_state()
 
-        import json
-        from pathlib import Path
-
     def save_state(self):
         data = {
             "quizzes": [quiz.to_dict() for quiz in self.quizzes],
