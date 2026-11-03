@@ -30,4 +30,14 @@ class QuizGame:
                 print(f"아쉽네요! 정답은 {quiz.answer}번입니다.\n")
 
         print(f"결과: {len(self.quizzes)}문제 중 {score}문제 정답!")
-        
+
+    def show_quizzes(self):
+        if not self.quizzes:
+            print("등록된 퀴즈가 없습니다.")
+            return
+
+        print("\n=== 등록된 퀴즈 목록 ===")
+        for number, quiz in enumerate(self.quizzes, start=1):
+            print(f"{number}. {quiz.question}")
+
+            

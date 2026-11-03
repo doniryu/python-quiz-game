@@ -18,7 +18,9 @@ while True:
     elif choice == "5":
         print("게임을 종료합니다.")
         break
-    elif choice in ["2", "3", "4"]:
+    elif choice == "3":
+        game.show_quizzes()
+    elif choice in ["2", "4"]:
         print("이 기능은 곧 만들 예정입니다.")
     else:
         print("1~5 중 하나를 입력해 주세요.")
